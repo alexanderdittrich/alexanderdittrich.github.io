@@ -1,35 +1,42 @@
 {
-  "name": "minimal-mistakes",
+  "name": "loveit-src",
+  "version": "0.2.0",
+  "description": "LoveIt theme source file",
   "private": true,
-  "version": "4.24.0",
-  "description": "Minimal Mistakes 2 column Jekyll theme.",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/mmistakes/minimal-mistakes.git"
-  },
-  "keywords": [
-    "jekyll",
-    "theme",
-    "minimal"
-  ],
-  "author": "Michael Rose",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mmistakes/minimal-mistakes/issues"
-  },
-  "homepage": "https://mmistakes.github.io/minimal-mistakes/",
-  "engines": {
-    "node": ">= 0.10.0"
-  },
   "devDependencies": {
-    "npm-run-all": "^4.1.5",
-    "onchange": "^7.1.0",
-    "uglify-js": "^3.13.6"
+    "@algolia/cli": "^4.0.8",
+    "@babel/cli": "^7.17.10",
+    "@babel/core": "^7.17.10",
+    "@babel/preset-env": "^7.17.10",
+    "babelify": "^10.0.0",
+    "browserify": "^16.5.2",
+    "core-js": "^3.22.4",
+    "husky": "^7.0.0",
+    "segmentit": "^2.0.3"
   },
   "scripts": {
-    "uglify": "uglifyjs assets/js/vendor/jquery/jquery-3.6.0.js assets/js/plugins/jquery.fitvids.js assets/js/plugins/jquery.greedy-navigation.js assets/js/plugins/jquery.magnific-popup.js assets/js/plugins/jquery.ba-throttle-debounce.js assets/js/plugins/smooth-scroll.js assets/js/plugins/gumshoe.js assets/js/_main.js -c -m -o assets/js/main.min.js",
-    "add-banner": "node banner.js",
-    "watch:js": "onchange \"assets/js/**/*.js\" -e \"assets/js/main.min.js\" -- npm run build:js",
-    "build:js": "npm run uglify && npm run add-banner"
-  }
+    "preinstall": "npx npm-force-resolutions",
+    "babel": "npx babel src/js --out-file assets/js/theme.js",
+    "build": "npm run babel && hugo -v --source=exampleSite --themesDir ../.. --gc",
+    "build-lunr-segmentit": "browserify src/lib/lunr/lunr.segmentit.js -o assets/lib/lunr/lunr.segmentit.js -t babelify --presets @babel/preset-env",
+    "start": "npm run babel && hugo server --source=exampleSite --themesDir ../.. -D --disableFastRender",
+    "start-production": "npm run babel && hugo server --source=exampleSite --themesDir ../.. -D --disableFastRender -e production",
+    "check": "htmlproofer exampleSite/public --check-html --allow-hash-href --empty-alt-ignore --disable-external",
+    "copy": "rm -rf resources && cp -rf exampleSite/resources resources",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dillonzq/LoveIt.git"
+  },
+  "keywords": [
+    "hugo",
+    "theme"
+  ],
+  "author": "Dillon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dillonzq/LoveIt/issues"
+  },
+  "homepage": "https://github.com/dillonzq/LoveIt#readme"
 }
