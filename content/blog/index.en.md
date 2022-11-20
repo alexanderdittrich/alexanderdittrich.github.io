@@ -1,11 +1,10 @@
 ---
 title: "Blog"
 date: 2019-08-02T11:04:49+08:00
-draft: true
-description: "About LoveIt"
-images: ["/Apple-Devices-Preview.png"]
+draft: false
+description: "Blog"
 
-lightgallery: true
+lightgallery: false
 
 math:
   enable: true
