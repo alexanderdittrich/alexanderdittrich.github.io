@@ -281,7 +281,7 @@
     Dribbble = ""
     Wordpress = ""
     Vine = ""
-    Googlescholar = ""
+    Googlescholar = "https://scholar.google.com/citations?hl=en&user=-G2nWLMAAAAJ"
     Researchgate = ""
     Mastodon = "https://mastodon.social/@alexdittrich"
     Thingiverse = ""
