@@ -16,3 +16,5 @@ social: true  # includes social icons at the bottom of the page
 ---
 
 I am about to finish my master's degree in Mechatronics at University of Stuttgart. Currently, I am working with Dieter Büchler at Max Planck Institute for Intelligent Systems on improving the capabilities of a pneumatically actuated robot arm playing table tennis.
+
+My research interests are on the intersection of control, machine learning and robotics.
