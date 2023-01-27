@@ -10,8 +10,8 @@
   --global-code-bg-color: rgba(181, 9, 172, 0.05);
   --global-text-color: #000000;
   --global-text-color-light: #828282;
-  --global-theme-color: #B509AC;
-  --global-hover-color: #B509AC;
+  --global-theme-color: #00369f;
+  --global-hover-color: #00369f;
   --global-footer-bg-color: #1C1C1D;
   --global-footer-text-color: #e8e8e8;
   --global-footer-link-color: #ffffff;
@@ -39,8 +39,8 @@ html[data-theme=dark] {
   --global-code-bg-color: #2c3237;
   --global-text-color: #e8e8e8;
   --global-text-color-light: #e8e8e8;
-  --global-theme-color: #2698BA;
-  --global-hover-color: #2698BA;
+  --global-theme-color: #0076df;
+  --global-hover-color: #0076df;
   --global-footer-bg-color: #e8e8e8;
   --global-footer-text-color: #1C1C1D;
   --global-footer-link-color: #000000;
@@ -102,6 +102,7 @@ body.sticky-bottom-footer {
  ******************************************************************************/
 p, h1, h2, h3, h4, h5, h6, em, div, li, span, strong {
   color: var(--global-text-color);
+  text-align: justify;
 }
 
 hr {
@@ -323,7 +324,7 @@ blockquote {
   font-size: 2rem;
 }
 .social .contact-icons a i::before {
-  color: var(--global-text-color);
+  color: var(--global-theme-color);
   transition-property: all 0.2s ease-in-out;
 }
 .social .contact-icons a:hover i::before {
@@ -355,6 +356,7 @@ footer.sticky-bottom {
   padding-top: 40px;
   padding-bottom: 40px;
   font-size: 0.9rem;
+  text-align: center;
 }
 
 .cv {
