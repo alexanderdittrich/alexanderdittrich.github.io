@@ -14,10 +14,10 @@ news: true  # includes a list of news items
 selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
 ---
-Master's Intern at [Max Planck Institute for Intelligent Systems](https://ei.is.mpg.de/) at the Empirical Inference department in the Intelligent Soft Robots group.
+Master's Intern at [Max Planck Institute for Intelligent Systems](https://is.mpg.de/).
 
 ## Research Interests
-My research interests are on the intersection of control, machine learning and robotics.
+My research interests are on the intersection of control, machine learning and robotics. I want to contribute to the next generation of robotic systems leaving predictable lab environments and solving tasks in the real-world.
 
 ## Biography
-I am about to finish my Master's degree in Mechatronics at University of Stuttgart. Currently, I am working with Dieter Büchler at Max Planck Institute for Intelligent Systems on improving the capabilities of a pneumatically actuated robot arm playing table tennis.
+Currently, I am working with Dieter Büchler as Graduate Intern at [Max Planck Institute for Intelligent Systems](https://is.mpg.de/) in the Intelligent Soft Robots group in the Empirical Inference department, on the improvement of the capabilities of a muscle-based table tennis robot. I received a Bachelor's and about to receive a Master's degree in Mechatronics at [University of Stuttgart](https://www.uni-stuttgart.de/). In 2017, I was a visiting student at [Peter the Great St. Petersburg Polytechnic University](https://english.spbstu.ru/).

@@ -70,6 +70,7 @@ body {
   padding-bottom: 70px;
   color: var(--global-text-color);
   background-color: var(--global-bg-color);
+  text-align: justify;
 }
 body h1, body h2, body h3, body h4, body h5, body h6 {
   scroll-margin-top: 66px;
@@ -98,8 +99,8 @@ body.sticky-bottom-footer {
 * Projects
 *****************************************************************************/
 /*******************************************************************************
- * Styles for the base elements of the theme.
- ******************************************************************************/
+* Styles for the base elements of the theme.
+******************************************************************************/
 p, h1, h2, h3, h4, h5, h6, em, div, li, span, strong {
   color: var(--global-text-color);
 }
@@ -110,6 +111,7 @@ hr {
 
 table td, table th {
   color: var(--global-text-color);
+  text-align: left;
 }
 table td {
   font-size: 1rem;
@@ -502,8 +504,8 @@ footer.sticky-bottom {
   font-size: 1.5rem;
 }
 .publications h2.year {
-  color: var(--global-divider-color);
-  border-top: 1px solid var(--global-divider-color);
+  color: var(--global-theme-color);
+  border-top: 1px solid var(--global-theme-color);
   padding-top: 1rem;
   margin-top: 2rem;
   margin-bottom: -2rem;
