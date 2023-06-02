@@ -14,7 +14,7 @@ news: true  # includes a list of news items
 selected_papers: false # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
 ---
-Master's Intern at [Max Planck Institute for Intelligent Systems](https://is.mpg.de/).
+PhD student at [École Polytechnique Fédérale de Lausanne](https://www.epfl.ch/labs/lis/).
 
 ## Research Interests
 I am interested in a wide variety of topics ranging from control, dynamical systems and machine learning and particularly where these areas overlap.
