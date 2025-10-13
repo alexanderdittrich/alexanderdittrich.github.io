@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Define title -->
+    <title>Alexander Dittrich</title>
+
+    <!-- Include favicon. Use, e.g., https://favicon.io/ -->
+    <link rel="icon" type="image/png" href="favicon.png" sizes="32x32" />
+
+    <!-- Include style sheets -->
+    <link rel="stylesheet" href="main.css" />
+
+    <!-- Fonts from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;600&display=swap" rel="stylesheet" />
+
+    <!-- Load FontAwesome (for icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  </head>
+
+  <body>
+    <!-- Animated Network Background -->
+    <canvas id="network-canvas"></canvas>
+    
+    <section id="content">
+      <!-- Avatar image -->
+      <img src="alex.jpg" alt="Carl Barks" class="avatar" />
+
+      <!-- Text -->
+      <h1>Alexander Dittrich</h1>
+      <p>
+        PhD Student in Robot Learning at the <br>Laboratory of Intelligent Systems at EPFL
+      </p>
+
+      <!-- Icons -->
+      <ul class="icons">
+        <li>
+          <a href="https://people.epfl.ch/alexander.dittrich" title="Institutional website"><i class="fa-solid fa-building-columns"></i></a>
+        </li>
+        <li>
+          <a href="https://github.com/alexanderdittrich" title="GitHub"><i class="fa-brands fa-github"></i></a>
+        </li>
+        <li>
+          <a href="https://mastodon.social/@alexdittrich" title="LinkedIn"><i class="fa-brands fa-mastodon"></i></a>
+        </li>
+        <li>
+          <a href="https://scholar.google.com/citations?user=-G2nWLMAAAAJ" title="Google Scholar"><i class="fa-brands fa-google-scholar"></i></a>
+        </li>
+        <li>
+          <a href="https://bsky.app/profile/alexdittrich.bsky.social" title="BlueSky"><i class="fa-brands fa-bluesky"></i></a>
+        </li>
+        <li>
+          <a href="https://www.youtube.com/@alexanderdittrich" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        </li>
+      </ul>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+      <div class="container">
+        <h2>About me</h2>
+  <p class="about-text">I am a doctoral researcher at the École Polytechnique Fédérale de Lausanne (EPFL) in the Laboratory of Intelligent Systems, advised by Prof. Dario Floreano. My work explores how adaptive mechanisms in artificial neural networks — such as Hebbian plasticity — can be combined with meta‑reinforcement learning to enable more autonomous and resilient robot behavior. I am particularly interested in how these ideas translate to unconventional soft robotic systems, including tensegrity structures, where morphology and control are deeply intertwined.</p>
+        <p class="about-text">Before joining EPFL, I studied Mechatronics at the University of Stuttgart, specializing in control engineering, robotics, and machine learning. My previous research at the Max Planck Institute for Intelligent Systems examined the generation and quantification of spin in robot table tennis, while work at the Fraunhofer Institute for Manufacturing Engineering and Automation focused on machine learning approaches for human activity recognition in assistive systems. Alongside my academic path, I have also worked in industry on distributed control, embedded systems, and autonomous robots.</p>
+      </div>
+    </section>
+
+    <!-- Research Projects Section -->
+    <section id="research-projects">
+      <div class="container">
+        <h2>Projects</h2>
+        <div class="projects-grid">
+          <div class="project-tile">
+            <a href="https://webdav.tuebingen.mpg.de/aimy/" class="project-link">
+              <div class="project-thumbnail">
+                <img src="project_thumbnails/aimy.png" alt="AIMY - Table Tennis Ball Launcher" />
+                <div class="project-overlay">
+                  <i class="fa-solid fa-external-link"></i>
+                </div>
+              </div>
+            </a>
+            <div class="project-info">
+              <div class="project-venue-badge">ICRA 2023</div>
+              <h3>AIMY - Table Tennis Ball Launcher</h3>
+              <p class="project-description">An open-source table tennis ball launcher generating human-level speeds and spins for robotic learning and research.</p>
+              <div class="project-buttons">
+                <a href="https://ieeexplore.ieee.org/document/10160336" target="_blank" rel="noopener" class="project-btn paper-btn" title="Paper">
+                  <i class="fa-solid fa-file-pdf"></i>
+                </a>
+                <a href="https://github.com/intelligent-soft-robots/aimy_target_shooting" target="_blank" rel="noopener" class="project-btn github-btn" title="Repository">
+                  <i class="fa-brands fa-github"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Placeholder for future projects -->
+          <div class="project-tile coming-soon">
+            <div class="project-thumbnail">
+              <div class="placeholder-content">
+                <i class="fa-solid fa-plus"></i>
+              </div>
+            </div>
+            <div class="project-info">
+              <h3>Coming Soon</h3>
+              <p class="project-description">More research projects on the way</p>
+            </div>
+          </div>
+
+          <div class="project-tile coming-soon">
+            <div class="project-thumbnail">
+              <div class="placeholder-content">
+                <i class="fa-solid fa-plus"></i>
+              </div>
+            </div>
+            <div class="project-info">
+              <h3>Coming Soon</h3>
+              <p class="project-description">More research projects on the way</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mastodon Live Feed Section -->
+    <section id="mastodon-feed">
+      <div class="container">
+        <h2>News</h2>
+        <div id="mastodon-posts" style="min-height: 200px;">
+          <p>Loading latest posts...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Impressum Section -->
+    <section id="impressum">
+      <div class="container">
+        <div class="impressum-content">
+          <p>
+            <strong>@ 2025 Alexander Dittrich.</strong>
+          <p class="credit">
+            Basic layout modified from <a href="https://timothygebhard.de/" target="_blank">Timothy Gebhardt</a> <br>
+            Particle animation inspired by <a href="https://vincentgarreau.com" target="_blank">Vincent Garreau</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Network Animation Script -->
+    <script>
+      /*
+       * Mastodon RSS Feed Fetcher
+       * Fetches and displays latest posts from Mastodon using the public RSS feed
+       * No external services, privacy-friendly
+       * Compatible with IE11+ and all modern browsers
+       */
+      document.addEventListener('DOMContentLoaded', function() {
+        // Check for required features
+        if (!window.fetch || !window.DOMParser) {
+          document.getElementById('mastodon-posts').innerHTML = 
+            '<p>Your browser does not support the required features to display the feed.</p>' +
+            '<p style="font-size:0.9em;color:#666;">Visit <a href="https://mastodon.social/@alexdittrich" target="_blank">@alexdittrich@mastodon.social</a> directly.</p>';
+          return;
+        }
+        
+        var feedUrl = 'https://mastodon.social/users/alexdittrich.rss';
+        var postsContainer = document.getElementById('mastodon-posts');
+        
+        // Try multiple CORS proxies in order
+        var corsProxies = [
+          'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(feedUrl),
+          'https://api.allorigins.win/get?url=' + encodeURIComponent(feedUrl),
+          'https://corsproxy.io/?' + encodeURIComponent(feedUrl)
+        ];
+        
+        function tryFetchWithProxy(proxyIndex) {
+          if (proxyIndex >= corsProxies.length) {
+            postsContainer.innerHTML = '<p>Unable to load Mastodon posts. CORS proxy unavailable.</p>' +
+              '<p style="font-size:0.9em;color:#666;">Visit <a href="https://mastodon.social/@alexdittrich" target="_blank">@alexdittrich@mastodon.social</a> directly.</p>';
+            return;
+          }
+          
+          var proxyUrl = corsProxies[proxyIndex];
+          var isAllOrigins = proxyUrl.indexOf('allorigins') !== -1;
+          
+          fetch(proxyUrl)
+            .then(function(response) {
+              if (!response.ok) throw new Error('Proxy failed');
+              return isAllOrigins ? response.json() : response.text();
+            })
+            .then(function(data) {
+              var xmlText = isAllOrigins ? data.contents : data;
+              var parser = new DOMParser();
+              var xml = parser.parseFromString(xmlText, 'application/xml');
+              
+              // Check for XML parsing errors
+              var parseError = xml.querySelector('parsererror');
+              if (parseError) {
+                throw new Error('XML parsing failed');
+              }
+              
+              var items = xml.querySelectorAll('item');
+              if (items.length === 0) {
+                throw new Error('No items found in feed');
+              }
+              
+              // Helper function to format date as "Month Year"
+              function formatEuropeanDate(dateString) {
+                if (!dateString) return '';
+                var date = new Date(dateString);
+                var monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                                  'July', 'August', 'September', 'October', 'November', 'December'];
+                var month = monthNames[date.getMonth()];
+                var year = date.getFullYear();
+                return 'Mastodon Post - ' + month + ' ' + year;
+              }
+              
+              var html = '<ul class="mastodon-feed-list">';
+              var maxPosts = 5; // Limit to prevent performance issues
+              var postCount = 0;
+              
+              // Convert NodeList to Array for IE11 compatibility
+              var itemsArray = Array.prototype.slice.call(items);
+              
+              itemsArray.forEach(function(item, idx) {
+                if (postCount >= maxPosts) return; // Show only latest posts
+                
+                var linkEl = item.querySelector('link');
+                var pubDateEl = item.querySelector('pubDate');
+                var descriptionEl = item.querySelector('description');
+                
+                var link = linkEl ? linkEl.textContent : '';
+                var pubDate = pubDateEl ? pubDateEl.textContent : '';
+                var description = descriptionEl ? descriptionEl.textContent : '';
+                
+                // Strip HTML tags for a cleaner display
+                var tempDiv = document.createElement('div');
+                tempDiv.innerHTML = description;
+                var textContent = tempDiv.textContent || tempDiv.innerText || '';
+                var truncated = textContent.length > 200 ? textContent.substring(0, 200) + '...' : textContent;
+                
+                html += '<li class="mastodon-feed-item">' +
+                  '<a href="' + link + '" target="_blank" rel="noopener" class="mastodon-post-link">' +
+                    '<span class="mastodon-feed-date">' + formatEuropeanDate(pubDate) + '</span>' +
+                    '<p class="mastodon-feed-content">' + truncated + '</p>' +
+                  '</a>' +
+                '</li>';
+                
+                postCount++; // Increment counter
+              });
+              html += '</ul>';
+              postsContainer.innerHTML = html;
+            })
+            .catch(function(err) {
+              console.log('Proxy ' + proxyIndex + ' failed:', err);
+              // Try next proxy
+              tryFetchWithProxy(proxyIndex + 1);
+            });
+        }
+        
+        // Start with first proxy
+        tryFetchWithProxy(0);
+      });
+      /*
+       * Animated Network Background
+       * Original implementation created for this website
+       * Inspired by common particle network animations found in academic websites
+       * Uses HTML5 Canvas API for cross-browser compatibility
+       * No external libraries required
+       */
+      
+      // Feature detection and fallback for older browsers
+      function supportsModernJS() {
+        try {
+          // Test for ES6 class support
+          eval('class TestClass {}');
+          // Test for const/let support
+          eval('const test = 1; let test2 = 2;');
+          // Test for arrow functions
+          eval('() => {}');
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+      
+      // Simple fallback animation for older browsers
+      function LegacyNetworkAnimation() {
+        var canvas = document.getElementById('network-canvas');
+        if (!canvas || !canvas.getContext) return;
+        
+        var ctx = canvas.getContext('2d');
+        var particles = [];
+        var numParticles = 30;
+        
+        // Linear scaling for particle count
+        function getResponsiveParticleCount() {
+          var screenWidth = window.innerWidth;
+          var minWidth = 320;
+          var maxWidth = 1920;
+          var minParticles = 15;
+          var maxParticles = 40;
+          
+          // Clamp screen width to range
+          var clampedWidth = Math.max(minWidth, Math.min(maxWidth, screenWidth));
+          
+          // Linear interpolation
+          var widthRatio = (clampedWidth - minWidth) / (maxWidth - minWidth);
+          return Math.floor(minParticles + widthRatio * (maxParticles - minParticles));
+        }
+        
+        function resizeCanvas() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          numParticles = getResponsiveParticleCount();
+        }
+        
+        function createParticles() {
+          particles = [];
+          for (var i = 0; i < numParticles; i++) {
+            particles.push({
+              x: Math.random() * canvas.width,
+              y: Math.random() * canvas.height,
+              vx: (Math.random() - 0.5) * 0.3,
+              vy: (Math.random() - 0.5) * 0.3,
+              radius: Math.random() * 3 + 1
+            });
+          }
+        }
+        
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
+          for (var i = 0; i < particles.length; i++) {
+            var particle = particles[i];
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            
+            if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+            if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+            
+              ctx.fillStyle = 'rgba(139, 195, 255, 0.4)';
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          
+          if (window.requestAnimationFrame) {
+            requestAnimationFrame(animate);
+          } else {
+            setTimeout(animate, 16);
+          }
+        }
+        
+        resizeCanvas();
+        createParticles();
+        animate();
+        
+        if (window.addEventListener) {
+          window.addEventListener('resize', function() {
+            resizeCanvas();
+            createParticles();
+          });
+        }
+      }
+      
+      class NetworkAnimation {
+        constructor() {
+          this.canvas = document.getElementById('network-canvas');
+          this.ctx = this.canvas.getContext('2d');
+          this.particles = [];
+          this.mouse = { x: 0, y: 0 };
+          
+          // Responsive settings based on screen size
+          this.updateResponsiveSettings();
+          
+          this.init();
+          this.bindEvents();
+          this.animate();
+        }
+        
+        updateResponsiveSettings() {
+          const screenWidth = window.innerWidth;
+          const screenHeight = window.innerHeight;
+          const devicePixelRatio = window.devicePixelRatio || 1;
+          
+          // Detect if it's a mobile/touch device
+          this.isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+          
+          // Linear scaling for particle count based on screen width
+          // Scale from 25 particles at 320px to 90 particles at 1920px
+          const minWidth = 320;
+          const maxWidth = 1920;
+          const minParticles = 25;
+          const maxParticles = 90;
+          
+          // Clamp screen width to range
+          const clampedWidth = Math.max(minWidth, Math.min(maxWidth, screenWidth));
+          
+          // Linear interpolation for particle count
+          const widthRatio = (clampedWidth - minWidth) / (maxWidth - minWidth);
+          this.numParticles = Math.floor(minParticles + widthRatio * (maxParticles - minParticles));
+          
+          // Linear scaling for connection distance
+          // Scale from 120px at 320px to 400px at 1920px
+          const minDistance = 120;
+          const maxDistance = 400;
+          this.maxDistance = Math.floor(minDistance + widthRatio * (maxDistance - minDistance));
+        }
+        
+        init() {
+          this.resizeCanvas();
+          this.createParticles();
+        }
+        
+        resizeCanvas() {
+          const devicePixelRatio = window.devicePixelRatio || 1;
+          const width = window.innerWidth;
+          const height = window.innerHeight;
+          
+          // Set canvas size accounting for device pixel ratio for crisp rendering
+          this.canvas.width = width * devicePixelRatio;
+          this.canvas.height = height * devicePixelRatio;
+          
+          // Scale back down with CSS
+          this.canvas.style.width = width + 'px';
+          this.canvas.style.height = height + 'px';
+          
+          // Scale the context to match device pixel ratio
+          this.ctx.scale(devicePixelRatio, devicePixelRatio);
+          
+          // Store actual display dimensions
+          this.width = width;
+          this.height = height;
+          
+          // Update responsive settings when canvas is resized
+          this.updateResponsiveSettings();
+        }
+        
+        createParticles() {
+          this.particles = [];
+          // Define a palette of mild, pleasant colors
+          const colorPalette = [
+            [139, 195, 255], // Light blue
+            [255, 182, 193], // Light pink
+            [152, 251, 152], // Light green
+            [255, 218, 185], // Peach
+            [221, 160, 221], // Plum
+            [173, 216, 230], // Light blue
+            [255, 222, 173], // Navajo white
+            [219, 112, 147]  // Pale violet red
+          ];
+          
+          for (let i = 0; i < this.numParticles; i++) {
+            const colorIndex = Math.floor(Math.random() * colorPalette.length);
+            this.particles.push({
+              x: Math.random() * this.width,
+              y: Math.random() * this.height,
+              vx: (Math.random() - 0.5) * 0.5,
+              vy: (Math.random() - 0.5) * 0.5,
+              radius: Math.random() * 5 + 1.5, // More varied sizes: 1.5 to 6.5
+              color: colorPalette[colorIndex]
+            });
+          }
+        }
+        
+        bindEvents() {
+          window.addEventListener('resize', () => {
+            this.resizeCanvas();
+            this.createParticles();
+          });
+          
+          window.addEventListener('mousemove', (e) => {
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+          });
+          
+          // Add particle on click
+          this.canvas.addEventListener('click', (e) => {
+            this.addParticle(e.clientX, e.clientY);
+          });
+          
+          // Add particle on touch for mobile devices
+          this.canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+              const touch = e.touches[0];
+              this.addParticle(touch.clientX, touch.clientY);
+              e.preventDefault();
+            }
+          });
+        }
+        
+        addParticle(x, y) {
+          // Color palette for new particles
+          const colorPalette = [
+            [139, 195, 255], // Light blue
+            [255, 182, 193], // Light pink
+            [152, 251, 152], // Light green
+            [255, 218, 185], // Peach
+            [221, 160, 221], // Plum
+            [173, 216, 230], // Light blue
+            [255, 222, 173], // Navajo white
+            [219, 112, 147]  // Pale violet red
+          ];
+          
+          const colorIndex = Math.floor(Math.random() * colorPalette.length);
+          const newParticle = {
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: (Math.random() - 0.5) * 0.8,
+            radius: Math.random() * 4 + 3, // Slightly larger: 3 to 7
+            color: colorPalette[colorIndex],
+            isNew: true,
+            scale: 0 // Start from scale 0 for animation
+          };
+          
+          this.particles.push(newParticle);
+          
+          // Animate the particle appearing
+          this.animateNewParticle(newParticle);
+        }
+        
+        animateNewParticle(particle) {
+          const duration = 500; // milliseconds
+          const startTime = Date.now();
+          
+          const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Ease out cubic for smooth animation
+            particle.scale = 1 - Math.pow(1 - progress, 3);
+            
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            } else {
+              particle.isNew = false;
+              particle.scale = 1;
+            }
+          };
+          
+          animate();
+        }
+        
+        updateParticles() {
+          this.particles.forEach(particle => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            
+            // Bounce off edges using display dimensions
+            if (particle.x < 0 || particle.x > this.width) {
+              particle.vx *= -1;
+            }
+            if (particle.y < 0 || particle.y > this.height) {
+              particle.vy *= -1;
+            }
+            
+            // Keep particles within bounds using display dimensions
+            particle.x = Math.max(0, Math.min(this.width, particle.x));
+            particle.y = Math.max(0, Math.min(this.height, particle.y));
+          });
+        }
+        
+        drawParticles() {
+          this.particles.forEach((particle, index) => {
+            const [red, green, blue] = particle.color;
+            
+            // Use scale for animation if particle is new
+            const scale = particle.isNew ? particle.scale : 1;
+            const actualRadius = particle.radius * scale;
+            const actualOpacity = 0.7 * scale;
+            
+            // Stronger node opacity
+            this.ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${actualOpacity})`;
+            this.ctx.beginPath();
+            this.ctx.arc(particle.x, particle.y, actualRadius, 0, Math.PI * 2);
+            this.ctx.fill();
+          });
+        }
+        
+        drawConnections() {
+            this.ctx.strokeStyle = 'rgba(139, 195, 255, 0.18)';
+          this.ctx.lineWidth = 1;
+          
+          for (let i = 0; i < this.particles.length; i++) {
+            for (let j = i + 1; j < this.particles.length; j++) {
+              const dx = this.particles[i].x - this.particles[j].x;
+              const dy = this.particles[i].y - this.particles[j].y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              if (distance < this.maxDistance) {
+                const opacity = (this.maxDistance - distance) / this.maxDistance;
+                  this.ctx.strokeStyle = `rgba(139, 195, 255, ${opacity * 0.18})`;
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
+                this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
+                this.ctx.stroke();
+              }
+            }
+          }
+        }
+        
+        drawMouseConnections() {
+            this.ctx.strokeStyle = 'rgba(174, 219, 255, 0.3)';
+          this.ctx.lineWidth = 1.25;
+          
+          this.particles.forEach(particle => {
+            const dx = this.mouse.x - particle.x;
+            const dy = this.mouse.y - particle.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < this.maxDistance) {
+              const opacity = (this.maxDistance - distance) / this.maxDistance;
+                this.ctx.strokeStyle = `rgba(174, 219, 255, ${opacity * 0.2})`;
+              this.ctx.beginPath();
+              this.ctx.moveTo(particle.x, particle.y);
+              this.ctx.lineTo(this.mouse.x, this.mouse.y);
+              this.ctx.stroke();
+            }
+          });
+        }
+        
+        animate() {
+          // Clear using actual canvas dimensions
+          this.ctx.clearRect(0, 0, this.width, this.height);
+          
+          this.updateParticles();
+          this.drawConnections();
+          this.drawParticles();
+          
+          // Skip mouse connections on mobile for better performance
+          if (!this.isMobile) {
+            this.drawMouseConnections();
+          }
+          
+          requestAnimationFrame(() => this.animate());
+        }
+      }
+      
+      // Initialize the network animation when the page loads
+      function initializeAnimation() {
+        if (supportsModernJS()) {
+          new NetworkAnimation();
+        } else {
+          LegacyNetworkAnimation();
+        }
+      }
+      
+      if (window.addEventListener) {
+        window.addEventListener('DOMContentLoaded', initializeAnimation);
+      } else if (window.attachEvent) {
+        window.attachEvent('onload', initializeAnimation);
+      } else {
+        window.onload = initializeAnimation;
+      }
+    </script>
+
+  </body>
+
+</html>
