@@ -144,9 +144,13 @@
     <section id="mastodon-feed">
       <div class="container">
         <h2>News</h2>
-        <div id="mastodon-posts" style="min-height: 200px;">
-          <p>Loading latest posts...</p>
+        <div id="mastodon-posts" class="mastodon-feed-list" aria-live="polite">
+          <div class="mastodon-card mastodon-skeleton"></div>
+          <div class="mastodon-card mastodon-skeleton"></div>
         </div>
+        <a href="https://mastodon.social/@alexdittrich" target="_blank" rel="noopener" class="mastodon-follow-btn">
+          <i class="fa-brands fa-mastodon"></i> Follow on Mastodon
+        </a>
       </div>
     </section>
 
@@ -167,8 +171,8 @@
     <!-- Network Animation Script -->
     <script>
       /*
-       * Mastodon RSS Feed Fetcher
-       * Fetches and displays latest posts from Mastodon using the public RSS feed
+       * Mastodon Feed Fetcher
+       * Fetches and displays latest posts via the public Mastodon API
        * No external services, privacy-friendly
        * Compatible with IE11+ and all modern browsers
        */
@@ -181,103 +185,138 @@
           return;
         }
         
-        var feedUrl = 'https://mastodon.social/users/alexdittrich.rss';
+        // Mastodon's public API sends CORS headers, so no proxy is needed
+        var accountId = '109352899002128855'; // @alexdittrich@mastodon.social
+        var feedUrl = 'https://mastodon.social/api/v1/accounts/' + accountId +
+          '/statuses?limit=5&exclude_replies=true&exclude_reblogs=true';
         var postsContainer = document.getElementById('mastodon-posts');
         
-        // Try multiple CORS proxies in order
-        var corsProxies = [
-          'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(feedUrl),
-          'https://api.allorigins.win/get?url=' + encodeURIComponent(feedUrl),
-          'https://corsproxy.io/?' + encodeURIComponent(feedUrl)
-        ];
-        
-        function tryFetchWithProxy(proxyIndex) {
-          if (proxyIndex >= corsProxies.length) {
-            postsContainer.innerHTML = '<p>Unable to load Mastodon posts. CORS proxy unavailable.</p>' +
-              '<p style="font-size:0.9em;color:#666;">Visit <a href="https://mastodon.social/@alexdittrich" target="_blank">@alexdittrich@mastodon.social</a> directly.</p>';
-            return;
-          }
-          
-          var proxyUrl = corsProxies[proxyIndex];
-          var isAllOrigins = proxyUrl.indexOf('allorigins') !== -1;
-          
-          fetch(proxyUrl)
-            .then(function(response) {
-              if (!response.ok) throw new Error('Proxy failed');
-              return isAllOrigins ? response.json() : response.text();
-            })
-            .then(function(data) {
-              var xmlText = isAllOrigins ? data.contents : data;
-              var parser = new DOMParser();
-              var xml = parser.parseFromString(xmlText, 'application/xml');
-              
-              // Check for XML parsing errors
-              var parseError = xml.querySelector('parsererror');
-              if (parseError) {
-                throw new Error('XML parsing failed');
-              }
-              
-              var items = xml.querySelectorAll('item');
-              if (items.length === 0) {
-                throw new Error('No items found in feed');
-              }
-              
-              // Helper function to format date as "Month Year"
-              function formatEuropeanDate(dateString) {
-                if (!dateString) return '';
-                var date = new Date(dateString);
-                var monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                                  'July', 'August', 'September', 'October', 'November', 'December'];
-                var month = monthNames[date.getMonth()];
-                var year = date.getFullYear();
-                return 'Mastodon Post - ' + month + ' ' + year;
-              }
-              
-              var html = '<ul class="mastodon-feed-list">';
-              var maxPosts = 5; // Limit to prevent performance issues
-              var postCount = 0;
-              
-              // Convert NodeList to Array for IE11 compatibility
-              var itemsArray = Array.prototype.slice.call(items);
-              
-              itemsArray.forEach(function(item, idx) {
-                if (postCount >= maxPosts) return; // Show only latest posts
-                
-                var linkEl = item.querySelector('link');
-                var pubDateEl = item.querySelector('pubDate');
-                var descriptionEl = item.querySelector('description');
-                
-                var link = linkEl ? linkEl.textContent : '';
-                var pubDate = pubDateEl ? pubDateEl.textContent : '';
-                var description = descriptionEl ? descriptionEl.textContent : '';
-                
-                // Strip HTML tags for a cleaner display
-                var tempDiv = document.createElement('div');
-                tempDiv.innerHTML = description;
-                var textContent = tempDiv.textContent || tempDiv.innerText || '';
-                var truncated = textContent.length > 200 ? textContent.substring(0, 200) + '...' : textContent;
-                
-                html += '<li class="mastodon-feed-item">' +
-                  '<a href="' + link + '" target="_blank" rel="noopener" class="mastodon-post-link">' +
-                    '<span class="mastodon-feed-date">' + formatEuropeanDate(pubDate) + '</span>' +
-                    '<p class="mastodon-feed-content">' + truncated + '</p>' +
-                  '</a>' +
-                '</li>';
-                
-                postCount++; // Increment counter
-              });
-              html += '</ul>';
-              postsContainer.innerHTML = html;
-            })
-            .catch(function(err) {
-              console.log('Proxy ' + proxyIndex + ' failed:', err);
-              // Try next proxy
-              tryFetchWithProxy(proxyIndex + 1);
-            });
+        // Format date as "10 October 2025"
+        function formatDate(dateString) {
+          var date = new Date(dateString);
+          var monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                            'July', 'August', 'September', 'October', 'November', 'December'];
+          return date.getDate() + ' ' + monthNames[date.getMonth()] + ' ' + date.getFullYear();
         }
         
-        // Start with first proxy
-        tryFetchWithProxy(0);
+        function el(tag, className, text) {
+          var node = document.createElement(tag);
+          if (className) node.className = className;
+          if (text !== undefined) node.textContent = text;
+          return node;
+        }
+        
+        // Rebuild the post HTML keeping only paragraphs, line breaks and http(s) links
+        function sanitize(source, target) {
+          Array.prototype.slice.call(source.childNodes).forEach(function(node) {
+            if (node.nodeType === 3) {
+              target.appendChild(document.createTextNode(node.textContent));
+              return;
+            }
+            if (node.nodeType !== 1) return;
+            var tag = node.nodeName.toLowerCase();
+            var className = node.getAttribute('class') || '';
+            var out;
+            if (tag === 'p') {
+              out = el('p');
+            } else if (tag === 'br') {
+              target.appendChild(el('br'));
+              return;
+            } else if (tag === 'a' && /^https?:\/\//.test(node.getAttribute('href') || '')) {
+              out = el('a', /hashtag/.test(className) ? 'mastodon-hashtag' : '');
+              out.href = node.getAttribute('href');
+              out.target = '_blank';
+              out.rel = 'noopener nofollow';
+            } else if (tag === 'span' && /invisible/.test(className)) {
+              return; // Mastodon hides URL prefixes like "https://"
+            } else if (tag === 'span' && /ellipsis/.test(className)) {
+              out = el('span', 'mastodon-ellipsis');
+            } else {
+              out = document.createDocumentFragment();
+            }
+            sanitize(node, out);
+            target.appendChild(out);
+          });
+        }
+        
+        function renderPost(status) {
+          var card = el('article', 'mastodon-card');
+          
+          var header = el('header', 'mastodon-card-header');
+          var avatar = el('img', 'mastodon-avatar');
+          avatar.src = status.account.avatar;
+          avatar.alt = '';
+          var author = el('div', 'mastodon-author');
+          author.appendChild(el('span', 'mastodon-name', status.account.display_name || status.account.username));
+          author.appendChild(el('span', 'mastodon-handle', '@' + status.account.acct + '@mastodon.social'));
+          var date = el('a', 'mastodon-date', formatDate(status.created_at));
+          date.href = status.url;
+          date.target = '_blank';
+          date.rel = 'noopener';
+          header.appendChild(avatar);
+          header.appendChild(author);
+          header.appendChild(date);
+          card.appendChild(header);
+          
+          var content = el('div', 'mastodon-content');
+          var parsed = new DOMParser().parseFromString(status.content, 'text/html');
+          sanitize(parsed.body, content);
+          var body = el('div', 'mastodon-body');
+          body.appendChild(content);
+          card.appendChild(body);
+          
+          var images = status.media_attachments.filter(function(m) { return m.type === 'image'; });
+          if (images.length) {
+            var media = el('a', 'mastodon-media');
+            media.href = status.url;
+            media.target = '_blank';
+            media.rel = 'noopener';
+            var img = el('img');
+            img.src = images[0].preview_url;
+            img.alt = images[0].description || '';
+            img.loading = 'lazy';
+            media.appendChild(img);
+            body.appendChild(media);
+          }
+          
+          var footer = el('footer', 'mastodon-card-footer');
+          [['fa-regular fa-comment', status.replies_count, 'Replies'],
+           ['fa-solid fa-retweet', status.reblogs_count, 'Boosts'],
+           ['fa-regular fa-star', status.favourites_count, 'Favourites']].forEach(function(stat) {
+            var span = el('span', 'mastodon-stat');
+            span.title = stat[2];
+            span.appendChild(el('i', stat[0]));
+            span.appendChild(document.createTextNode(' ' + stat[1]));
+            footer.appendChild(span);
+          });
+          var view = el('a', 'mastodon-view', 'View post ');
+          view.href = status.url;
+          view.target = '_blank';
+          view.rel = 'noopener';
+          view.appendChild(el('i', 'fa-solid fa-arrow-right'));
+          footer.appendChild(view);
+          card.appendChild(footer);
+          
+          return card;
+        }
+        
+        fetch(feedUrl)
+          .then(function(response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json();
+          })
+          .then(function(statuses) {
+            if (!statuses.length) throw new Error('No posts found');
+            postsContainer.innerHTML = '';
+            statuses.forEach(function(status) {
+              postsContainer.appendChild(renderPost(status));
+            });
+          })
+          .catch(function(err) {
+            console.log('Mastodon feed failed:', err);
+            postsContainer.innerHTML = '<p class="mastodon-error">Unable to load Mastodon posts.</p>' +
+              '<p style="font-size:0.9em;color:#666;">Visit <a href="https://mastodon.social/@alexdittrich" target="_blank">@alexdittrich@mastodon.social</a> directly.</p>';
+          });
       });
       /*
        * Animated Network Background

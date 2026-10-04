@@ -240,6 +240,7 @@ a:hover {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    color: transparent; /* hide alt text while loading */
     transition: transform 0.3s ease;
 }
 
@@ -370,6 +371,7 @@ a:hover {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    color: transparent; /* hide alt text while loading */
     transition: transform 0.3s ease;
 }
 
@@ -594,7 +596,7 @@ a:hover {
 
 /* Mastodon Feed Section */
 #mastodon-feed {
-    background: #e8eaed;
+    background: linear-gradient(180deg, #e8ecf3 0%, #f5f7fa 100%);
     padding: 80px 0 100px 0;
     border-top: 1px solid #e9ecef;
     width: 100%;
@@ -640,60 +642,253 @@ a:hover {
 }
 
 .mastodon-feed-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    max-width: 700px;
+    max-width: 600px;
     margin: 0 auto;
-}
-
-.mastodon-feed-item {
-    margin-bottom: 15px;
-    padding: 15px;
-    background: #f8f9fa;
-    /* Vendor prefixes for border-radius */
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
-    border-radius: 6px;
-    border-left: 3px solid #8bc3ff;
-    /* Vendor prefixes for transition */
-    -webkit-transition: all 0.3s ease;
-    -moz-transition: all 0.3s ease;
-    -ms-transition: all 0.3s ease;
-    transition: all 0.3s ease;
-    font-size: 0.9em;
-}
-
-.mastodon-feed-item:hover {
-    background: #e9ecef;
-    /* Vendor prefixes for transform */
-    -webkit-transform: translateX(5px);
-    -moz-transform: translateX(5px);
-    -ms-transform: translateX(5px);
-    transform: translateX(5px);
-}
-
-.mastodon-feed-item .mastodon-post-link {
-    display: block;
-    color: inherit;
-    text-decoration: none;
     text-align: left;
 }
 
-.mastodon-feed-date {
-    font-size: 0.9em;
-    color: #6c757d;
+.mastodon-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    padding: 14px 18px 10px 18px;
+    margin-bottom: 14px;
+    font-size: 0.8em;
+    -webkit-transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mastodon-card:hover {
+    -webkit-transform: translateY(-4px);
+    transform: translateY(-4px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+}
+
+.mastodon-card-header {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.mastodon-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+}
+
+.mastodon-author {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    min-width: 0;
+    line-height: 1.3;
+}
+
+.mastodon-name {
+    display: block;
     font-weight: 600;
-    display: block;
-    margin-bottom: 6px;
-    text-align: left;
+    color: #333;
 }
 
-.mastodon-feed-content {
+.mastodon-handle {
+    display: block;
+    font-size: 0.8em;
+    color: #6c757d;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mastodon-date {
+    font-size: 0.8em;
+    color: #6c757d;
+    white-space: nowrap;
+    margin-left: 12px;
+}
+
+.mastodon-date:hover {
+    color: #1565c0;
+}
+
+.mastodon-body {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.mastodon-content {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    min-width: 0;
     color: #2c3e50;
     line-height: 1.5;
-    margin: 0;
-    text-align: left;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    /* Limit long posts to four lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.mastodon-content p {
+    margin: 0 0 0.4em 0;
+}
+
+.mastodon-content p:last-child {
+    margin-bottom: 0;
+}
+
+.mastodon-content a {
+    color: #1565c0;
+}
+
+.mastodon-content a:hover {
+    color: #217ee7;
+    text-decoration: underline;
+}
+
+.mastodon-ellipsis::after {
+    content: '\2026';
+}
+
+.mastodon-content .mastodon-hashtag {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.mastodon-media {
+    display: block;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    width: 88px;
+    height: 88px;
+    margin-left: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f0f2f5;
+}
+
+.mastodon-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    color: transparent; /* hide alt text while loading */
+    -webkit-transition: transform 0.4s ease;
+    transition: transform 0.4s ease;
+}
+
+.mastodon-media:hover img {
+    -webkit-transform: scale(1.08);
+    transform: scale(1.08);
+}
+
+.mastodon-card-footer {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px solid #edf0f3;
+    font-size: 0.85em;
+    color: #8a949e;
+}
+
+.mastodon-stat {
+    margin-right: 20px;
+}
+
+.mastodon-view {
+    margin-left: auto;
+    font-weight: 600;
+    color: #1565c0;
+}
+
+.mastodon-view i {
+    -webkit-transition: transform 0.2s ease;
+    transition: transform 0.2s ease;
+}
+
+.mastodon-view:hover {
+    color: #217ee7;
+}
+
+.mastodon-view:hover i {
+    -webkit-transform: translateX(4px);
+    transform: translateX(4px);
+}
+
+.mastodon-follow-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 9px 22px;
+    font-size: 0.85em;
+    border-radius: 999px;
+    background: #6364ff;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 6px 16px rgba(99, 100, 255, 0.3);
+    -webkit-transition: background 0.2s ease, transform 0.2s ease;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.mastodon-follow-btn:hover {
+    background: #563acc;
+    color: #fff;
+    -webkit-transform: translateY(-2px);
+    transform: translateY(-2px);
+}
+
+.mastodon-follow-btn i {
+    margin-right: 6px;
+}
+
+.mastodon-error {
+    text-align: center;
+    color: #333;
+}
+
+/* Loading placeholder */
+.mastodon-skeleton {
+    height: 110px;
+    background: #fff;
+    background: -webkit-linear-gradient(left, #fff 30%, #f0f2f5 50%, #fff 70%);
+    background: linear-gradient(90deg, #fff 30%, #f0f2f5 50%, #fff 70%);
+    background-size: 200% 100%;
+    -webkit-animation: mastodon-shimmer 1.4s linear infinite;
+    animation: mastodon-shimmer 1.4s linear infinite;
+}
+
+.mastodon-skeleton:hover {
+    -webkit-transform: none;
+    transform: none;
+}
+
+@-webkit-keyframes mastodon-shimmer {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
+}
+
+@keyframes mastodon-shimmer {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
 }
 
 /* Impressum Section */
@@ -762,9 +957,28 @@ a:hover {
         max-width: 100%;
     }
     
-    .mastodon-feed-item {
-        padding: 12px;
-        font-size: 0.9em;
+    .mastodon-card {
+        padding: 12px 14px 8px 14px;
+    }
+    
+    .mastodon-media {
+        width: 64px;
+        height: 64px;
+        margin-left: 10px;
+    }
+    
+    .mastodon-card-header {
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    }
+    
+    .mastodon-date {
+        width: 100%;
+        margin: 4px 0 0 44px;
+    }
+    
+    .mastodon-stat {
+        margin-right: 12px;
     }
     
     #impressum {
