@@ -18,6 +18,7 @@
     /* Colors used by the canvas animation (r, g, b) */
     --net-node: 120, 113, 108;
     --net-accent: 155, 28, 34;
+    --sketch: #d6d2cd;              /* cave-floor sketch at the bottom */
 
     --radius: 12px;
     --container: 1080px;
@@ -41,6 +42,7 @@
 
         --net-node: 160, 160, 160;
         --net-accent: 232, 129, 127;
+        --sketch: #353535;
 
         color-scheme: dark;
     }
@@ -59,6 +61,7 @@
 
     --net-node: 160, 160, 160;
     --net-accent: 232, 129, 127;
+    --sketch: #353535;
 
     color-scheme: dark;
 }
@@ -596,15 +599,36 @@ h3 {
    ========================================================================== */
 
 .site-footer {
-    padding: 40px 0 48px;
+    position: relative;
+    padding: 0;
     font-size: 0.85rem;
     text-align: center;
     color: var(--text-subtle);
     border-top: 1px solid var(--border);
 }
 
+/* Sketch of a cave floor along the bottom of the page.
+   Drawn at a fixed size (2560 x 160 px) and centred: narrower screens show the
+   middle part, so it never stretches when the window is resized. */
+.cave-floor {
+    height: 140px; /* the drawing is 160px high; its empty top 20px are cropped */
+    background-color: var(--sketch);
+    -webkit-mask: url("cave-floor.svg") center bottom / 2560px 160px no-repeat;
+    mask: url("cave-floor.svg") center bottom / 2560px 160px no-repeat;
+    transition: background-color 0.3s ease;
+}
+
+.site-footer .container {
+    /* the copyright sits above the cave's floor line (which is ~62px above the bottom here) */
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 76px;
+    z-index: 1;
+}
+
 .site-footer p {
-    margin: 0 0 4px;
+    margin: 0;
 }
 
 /* ==========================================================================
