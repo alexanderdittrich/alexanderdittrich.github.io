@@ -32,42 +32,59 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link rel="stylesheet" href="main.css" />
+    <!-- Apply a saved light/dark choice before the page renders (avoids a flash) -->
+    <script>
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    </script>
   </head>
 
   <body>
     <!-- Hero -->
     <header class="hero" id="top">
-      <canvas id="network-canvas" aria-hidden="true"></canvas>
+      <canvas id="network-canvas" data-avoid=".hero-robot" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <div class="hero-content">
+          <img src="alex.webp" alt="Portrait of Alexander Dittrich" class="avatar" width="400" height="400" />
 
-      <div class="hero-content">
-        <img src="alex.webp" alt="Portrait of Alexander Dittrich" class="avatar" width="400" height="400" />
+          <div class="hero-text">
+            <h1>Alexander Dittrich</h1>
+            <p class="hero-role">PhD Student in Robot Learning<br />Laboratory of Intelligent Systems, EPFL</p>
 
-        <h1>Alexander Dittrich</h1>
-        <p class="hero-role">PhD Student in Robot Learning<br />Laboratory of Intelligent Systems, EPFL</p>
+            <ul class="hero-links">
+              <li><a href="mailto:alexander.dittrich@epfl.ch">Email</a></li>
+              <li><a href="https://scholar.google.com/citations?user=-G2nWLMAAAAJ">Google Scholar</a></li>
+              <li><a href="https://github.com/alexanderdittrich">GitHub</a></li>
+              <li><a href="https://people.epfl.ch/alexander.dittrich">EPFL</a></li>
+            </ul>
+            <ul class="hero-links hero-links-social">
+              <li><a href="https://mastodon.social/@alexdittrich" rel="me">Mastodon</a></li>
+              <li><a href="https://bsky.app/profile/alexdittrich.bsky.social">Bluesky</a></li>
+              <li><a href="https://www.youtube.com/@alexanderdittrich">YouTube</a></li>
+            </ul>
+          </div>
+        </div>
 
-        <ul class="hero-links">
-          <li><a href="mailto:alexander.dittrich@epfl.ch">Email</a></li>
-          <li><a href="https://scholar.google.com/citations?user=-G2nWLMAAAAJ">Google Scholar</a></li>
-          <li><a href="https://github.com/alexanderdittrich">GitHub</a></li>
-          <li><a href="https://people.epfl.ch/alexander.dittrich">EPFL</a></li>
-        </ul>
-        <ul class="hero-links hero-links-social">
-          <li><a href="https://mastodon.social/@alexdittrich" rel="me">Mastodon</a></li>
-          <li><a href="https://bsky.app/profile/alexdittrich.bsky.social">Bluesky</a></li>
-          <li><a href="https://www.youtube.com/@alexanderdittrich">YouTube</a></li>
-        </ul>
+        <div class="hero-robot">
+          <canvas class="tensegrity" id="tensegrity" aria-label="Interactive tensegrity robot"></canvas>
+          <p class="robot-hint">Drag a node or click a cable</p>
+        </div>
       </div>
-
     </header>
 
     <!-- Sticky navigation, sticks once the hero has scrolled away -->
     <nav class="site-nav" aria-label="Sections">
       <div class="nav-inner">
         <a href="#top" class="nav-name">Alexander Dittrich</a>
-        <ul>
-          <li><a href="#about">About</a></li>
-          <li><a href="#projects">Projects</a></li>
-        </ul>
+        <div class="nav-right">
+          <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#projects">Projects</a></li>
+          </ul>
+          <button class="theme-toggle" type="button" aria-label="Switch between light and dark mode" title="Switch between light and dark mode"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
+        </div>
       </div>
     </nav>
 
@@ -163,5 +180,9 @@
     </footer>
 
     <script src="main.js" defer></script>
+    <script src="tensegrity.js" defer></script>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => new TensegrityRobot(document.getElementById('tensegrity')));
+    </script>
   </body>
 </html>

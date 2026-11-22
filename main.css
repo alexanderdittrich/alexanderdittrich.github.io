@@ -23,11 +23,12 @@
     --container: 1080px;
     --nav-height: 56px;
 
-    color-scheme: light dark;
+    color-scheme: light;
 }
 
+/* Dark theme: follows the system setting unless the visitor picked a theme with the toggle */
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
         --bg: #151515;
         --surface: #1c1c1c;
         --border: #2c2c2c;
@@ -40,7 +41,26 @@
 
         --net-node: 160, 160, 160;
         --net-accent: 232, 129, 127;
+
+        color-scheme: dark;
     }
+}
+
+:root[data-theme="dark"] {
+    --bg: #151515;
+    --surface: #1c1c1c;
+    --border: #2c2c2c;
+    --text: #ededed;
+    --text-muted: #b5b5b5;
+    --text-subtle: #8a8a8a;
+    --accent: #e8817f;
+    --accent-hover: #f3a9a7;
+    --accent-soft: rgba(232, 129, 127, 0.1);
+
+    --net-node: 160, 160, 160;
+    --net-accent: 232, 129, 127;
+
+    color-scheme: dark;
 }
 
 /* ==========================================================================
@@ -66,6 +86,7 @@ body {
     color: var(--text);
     background: var(--bg);
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 img,
@@ -115,7 +136,7 @@ h3 {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 72px 24px;
+    padding: 48px 24px;
     overflow: hidden;
 }
 
@@ -126,11 +147,24 @@ h3 {
     height: 100%;
 }
 
+/* Two columns: photo + text on the left, tensegrity robot on the right */
+.hero-inner {
+    position: relative;
+    width: 100%;
+    max-width: var(--container);
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: center;
+    pointer-events: none; /* let clicks reach the network canvas behind */
+}
+
 .hero-content {
     position: relative;
-    max-width: 560px;
-    text-align: center;
-    pointer-events: none; /* let clicks reach the canvas around the text */
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 32px;
 }
 
 .hero-content a,
@@ -138,12 +172,16 @@ h3 {
     pointer-events: auto;
 }
 
+.hero-text {
+    min-width: 0;
+}
+
 .avatar {
-    width: min(176px, 45vw);
+    flex: none;
+    width: 168px;
     height: auto;
     aspect-ratio: 1;
     object-fit: cover;
-    margin: 0 auto 28px;
     border-radius: 50%;
 }
 
@@ -166,7 +204,6 @@ h3 {
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 4px 0;
     font-size: 0.98rem;
 }
@@ -196,16 +233,81 @@ h3 {
     margin-top: 8px;
 }
 
-/* Entrance: hero elements fade in one after another */
-.hero-content > * {
+/* Interactive tensegrity robot (see tensegrity.js) */
+.hero-robot {
+    position: relative;
+    height: 440px;
+}
+
+.tensegrity {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    pointer-events: auto;
+}
+
+.tensegrity.pointing { cursor: pointer; }
+.tensegrity.dragging { cursor: grabbing; }
+
+.robot-hint {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-subtle);
+    pointer-events: none;
+}
+
+/* Medium screens: photo above the text, still left-aligned */
+@media (max-width: 1080px) {
+    .hero-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .avatar {
+        width: 140px;
+    }
+}
+
+/* Small screens: everything stacked and centred, robot below */
+@media (max-width: 760px) {
+    .hero-inner {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .hero-content {
+        align-items: center;
+        text-align: center;
+    }
+
+    .hero-links {
+        justify-content: center;
+    }
+
+    .hero-robot {
+        height: 300px;
+    }
+}
+
+/* Entrance: photo first, then the text lines one after another */
+.avatar,
+.hero-text > * {
     animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
-.hero-content > :nth-child(1) { animation-delay: 0.1s; }
-.hero-content > :nth-child(2) { animation-delay: 0.2s; }
-.hero-content > :nth-child(3) { animation-delay: 0.3s; }
-.hero-content > :nth-child(4) { animation-delay: 0.4s; }
-.hero-content > :nth-child(5) { animation-delay: 0.5s; }
+.avatar { animation-delay: 0.1s; }
+.hero-text > :nth-child(1) { animation-delay: 0.2s; }
+.hero-text > :nth-child(2) { animation-delay: 0.3s; }
+.hero-text > :nth-child(3) { animation-delay: 0.4s; }
+.hero-text > :nth-child(4) { animation-delay: 0.5s; }
 
 @keyframes rise {
     from { opacity: 0; transform: translateY(10px); }
@@ -267,6 +369,38 @@ h3 {
 .site-nav ul a:hover {
     color: var(--text);
     background: var(--accent-soft);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-toggle:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
 }
 
 /* ==========================================================================
@@ -529,7 +663,7 @@ h3 {
     }
 
     .hero {
-        padding: 56px 16px;
+        padding: 40px 16px;
     }
 }
 

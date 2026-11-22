@@ -16,7 +16,9 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
  * ------------------------------------------------------------------------ */
 
 class NetworkAnimation {
-  static FIRE_INTERVAL = 2600; // ms between pulses (on average)
+  static FIRE_INTERVAL = 1600; // ms between new messages (on average)
+  static MAX_PULSES = 24;      // signals travelling at the same time
+  static MAX_HOPS = 2;         // how many times a message can be passed on
   static SIGNAL_TIME = 380;    // ms for a signal to cross a connection
   static RIPPLE_TIME = 900;    // ms for the ring around a receiving node
 
@@ -35,6 +37,10 @@ class NetworkAnimation {
     this.lastWidth = 0;
     this.nextFire = 0;
     this.frame = this.frame.bind(this);
+
+    // Optional area the network keeps out of (e.g. data-avoid=".hero-robot")
+    this.avoidEl = canvas.dataset.avoid ? document.querySelector(canvas.dataset.avoid) : null;
+    this.avoid = null;
 
     this.readColors();
     this.resize(true);
@@ -58,6 +64,7 @@ class NetworkAnimation {
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.width = width;
     this.height = height;
+    this.updateAvoid();
 
     // Mobile browsers fire "resize" when the address bar shows or hides.
     // Only reseed when the width actually changes.
@@ -79,11 +86,35 @@ class NetworkAnimation {
       x, y,
       vx: (Math.random() - 0.5) * 0.3,
       vy: (Math.random() - 0.5) * 0.3,
-      radius: 1.2 + Math.random() * 1.8,
+      radius: 2 + Math.random() * 2.2,
       energy: 0,  // > 0 right after receiving a pulse
       scale: 1,   // used for fading in
       born: 0,
     };
+  }
+
+  // The avoided area is a circle around the element (a round "clearing")
+  updateAvoid() {
+    if (!this.avoidEl) return;
+    const r = this.avoidEl.getBoundingClientRect();
+    const h = this.host.getBoundingClientRect();
+    this.avoid = r.width && r.height
+      ? { cx: r.left - h.left + r.width / 2, cy: r.top - h.top + r.height / 2, r: Math.min(r.width, r.height) / 2 + 20 }
+      : null;
+  }
+
+  inAvoid(x, y) {
+    const a = this.avoid;
+    return a && Math.hypot(x - a.cx, y - a.cy) < a.r;
+  }
+
+  // Does the segment a-b pass through the clearing?
+  crossesAvoid(ax, ay, bx, by) {
+    const a = this.avoid;
+    if (!a) return false;
+    const dx = bx - ax, dy = by - ay;
+    const t = Math.max(0, Math.min(1, ((a.cx - ax) * dx + (a.cy - ay) * dy) / (dx * dx + dy * dy || 1)));
+    return Math.hypot(ax + t * dx - a.cx, ay + t * dy - a.cy) < a.r;
   }
 
   seed() {
@@ -93,7 +124,12 @@ class NetworkAnimation {
     this.ripples = [];
     this.glow.clear();
     for (let i = 0; i < this.count; i++) {
-      const p = this.makeParticle(Math.random() * this.width, Math.random() * this.height);
+      let x, y, tries = 0;
+      do {
+        x = Math.random() * this.width;
+        y = Math.random() * this.height;
+      } while (this.inAvoid(x, y) && ++tries < 50);
+      const p = this.makeParticle(x, y);
       p.scale = 0;
       p.born = now + Math.random() * 1200; // gentle fade-in on load
       this.particles.push(p);
@@ -103,6 +139,7 @@ class NetworkAnimation {
 
   bindEvents() {
     window.addEventListener('resize', () => this.resize(false));
+    window.addEventListener('load', () => this.updateAvoid()); // layout can shift once fonts load
 
     this.host.addEventListener('pointermove', (e) => {
       if (e.pointerType !== 'mouse') return;
@@ -124,8 +161,8 @@ class NetworkAnimation {
     document.addEventListener('visibilitychange', () => this.updateRunning());
     reduceMotion.addEventListener('change', () => this.updateRunning());
 
-    // Follow light/dark mode changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    // Follow light/dark mode changes (system setting or the toggle button)
+    document.addEventListener('themechange', () => {
       this.readColors();
       if (!this.running) this.draw();
     });
@@ -156,10 +193,20 @@ class NetworkAnimation {
 
   // A signal lights up the connection from one node to another
   sendPulse(from, to, hops) {
-    if (this.pulses.length >= 12) return;
+    if (this.pulses.length >= NetworkAnimation.MAX_PULSES) return;
     const source = this.particles[from];
     if (source) source.energy = 1; // the sender flashes
-    this.pulses.push({ from, to, t: 0, start: performance.now(), hops });
+    this.pulses.push({ from, to, t: 0, start: this.clock || performance.now(), hops });
+  }
+
+  // Pick up to `count` different neighbours of node i, skipping some nodes
+  pickNeighbors(i, count, exclude = []) {
+    const options = (this.neighbors[i] || []).filter((j) => !exclude.includes(j) && this.particles[j].energy < 0.5);
+    const picked = [];
+    while (picked.length < count && options.length) {
+      picked.push(options.splice(Math.floor(Math.random() * options.length), 1)[0]);
+    }
+    return picked;
   }
 
   addNode(x, y) {
@@ -176,12 +223,13 @@ class NetworkAnimation {
       .filter(({ j, d }) => j !== index && d < maxSq)
       .sort((a, b) => a.d - b.d)
       .slice(0, 2)
-      .forEach(({ j }) => this.sendPulse(index, j, 0));
+      .forEach(({ j }) => this.sendPulse(index, j, 1));
     if (!this.running) this.draw();
   }
 
   update(now) {
     const { particles } = this;
+    this.clock = now;
 
     for (const p of particles) {
       p.x += p.vx;
@@ -190,6 +238,19 @@ class NetworkAnimation {
       if (p.y < 0 || p.y > this.height) p.vy *= -1;
       p.x = Math.max(0, Math.min(this.width, p.x));
       p.y = Math.max(0, Math.min(this.height, p.y));
+      if (this.inAvoid(p.x, p.y)) {
+        // Push back to the edge of the clearing and bounce off it
+        const a = this.avoid;
+        const nx = (p.x - a.cx) / (Math.hypot(p.x - a.cx, p.y - a.cy) || 1);
+        const ny = (p.y - a.cy) / (Math.hypot(p.x - a.cx, p.y - a.cy) || 1);
+        p.x = a.cx + nx * (a.r + 0.5);
+        p.y = a.cy + ny * (a.r + 0.5);
+        const dot = p.vx * nx + p.vy * ny;
+        if (dot < 0) {
+          p.vx -= 2 * dot * nx;
+          p.vy -= 2 * dot * ny;
+        }
+      }
       p.energy *= 0.97;
       if (p.born) {
         const progress = Math.min(Math.max((now - p.born) / 900, 0), 1);
@@ -198,15 +259,16 @@ class NetworkAnimation {
       }
     }
 
-    // Occasionally a node sends a pulse to one neighbour
+    // Now and then a node sends a message to up to two neighbours
     if (now > this.nextFire) {
       const i = Math.floor(Math.random() * particles.length);
-      const options = this.neighbors[i] || [];
-      if (options.length && !particles[i].born) {
-        this.sendPulse(i, options[Math.floor(Math.random() * options.length)], 1);
+      if (!particles[i].born) {
+        for (const j of this.pickNeighbors(i, 2)) this.sendPulse(i, j, NetworkAnimation.MAX_HOPS);
       }
       this.nextFire = now + NetworkAnimation.FIRE_INTERVAL * (0.5 + Math.random());
     }
+
+    const forwarded = [];
 
     this.pulses = this.pulses.filter((pulse) => {
       const a = particles[pulse.from];
@@ -219,13 +281,17 @@ class NetworkAnimation {
       b.energy = 1;
       this.ripples.push({ node: pulse.to, start: now, progress: 0 });
       this.glow.set(this.edgeKey(pulse.from, pulse.to), 1);
-      // Sometimes the message is passed on once more
-      if (pulse.hops > 0 && Math.random() < 0.5) {
-        const next = (this.neighbors[pulse.to] || []).filter((j) => j !== pulse.from);
-        if (next.length) this.sendPulse(pulse.to, next[Math.floor(Math.random() * next.length)], pulse.hops - 1);
+      // Usually the message is passed on, to one or sometimes two neighbours
+      if (pulse.hops > 0 && Math.random() < 0.75) {
+        const count = Math.random() < 0.35 ? 2 : 1;
+        for (const j of this.pickNeighbors(pulse.to, count, [pulse.from])) {
+          forwarded.push([pulse.to, j, pulse.hops - 1]);
+        }
       }
       return false;
     });
+    // Send forwarded messages after the loop (adding them while filtering would lose them)
+    for (const [from, to, hops] of forwarded) this.sendPulse(from, to, hops);
 
     this.ripples = this.ripples.filter((r) => {
       r.progress = (now - r.start) / NetworkAnimation.RIPPLE_TIME;
@@ -252,7 +318,7 @@ class NetworkAnimation {
       for (let j = i + 1; j < particles.length; j++) {
         const b = particles[j];
         const dSq = (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
-        if (dSq >= maxSq) continue;
+        if (dSq >= maxSq || this.crossesAvoid(a.x, a.y, b.x, b.y)) continue;
         this.neighbors[i].push(j);
         this.neighbors[j].push(i);
 
@@ -273,7 +339,7 @@ class NetworkAnimation {
     if (this.mouse) {
       for (const p of particles) {
         const d = Math.hypot(this.mouse.x - p.x, this.mouse.y - p.y);
-        if (d < maxDistance) {
+        if (d < maxDistance && !this.crossesAvoid(p.x, p.y, this.mouse.x, this.mouse.y)) {
           ctx.strokeStyle = `rgba(${nodeColor}, ${(1 - d / maxDistance) * 0.18})`;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
@@ -343,9 +409,48 @@ function initVideos() {
 }
 
 /* --------------------------------------------------------------------------
+ * Light/dark toggle
+ * Without a saved choice the page follows the system setting.
+ * Animations listen for the "themechange" event to update their colours.
+ * ------------------------------------------------------------------------ */
+
+function initThemeToggle() {
+  const button = document.querySelector('.theme-toggle');
+  const root = document.documentElement;
+  const system = window.matchMedia('(prefers-color-scheme: dark)');
+  const current = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+
+  const render = () => {
+    const dark = current() === 'dark';
+    if (button) {
+      button.innerHTML = `<i class="fa-solid fa-${dark ? 'sun' : 'moon'}" aria-hidden="true"></i>`;
+      const label = dark ? 'Switch to light mode' : 'Switch to dark mode';
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    }
+    // Browser UI colour (e.g. the address bar on phones)
+    const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
+    document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => { meta.content = bg; });
+    document.dispatchEvent(new Event('themechange'));
+  };
+
+  if (button) {
+    button.addEventListener('click', () => {
+      const next = current() === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch (e) { /* private mode: not remembered */ }
+      render();
+    });
+  }
+  system.addEventListener('change', render);
+  render();
+}
+
+/* --------------------------------------------------------------------------
  * Start
  * ------------------------------------------------------------------------ */
 
 const canvas = document.getElementById('network-canvas');
 if (canvas && canvas.getContext) new NetworkAnimation(canvas);
 initVideos();
+initThemeToggle();
