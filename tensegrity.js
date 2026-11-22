@@ -28,6 +28,7 @@ class TensegrityRobot {
   static CAMERA = 9;              // camera distance in model units
   static YAW = 0.55;
   static PITCH = -0.32;           // camera looks slightly down onto the ground
+  static MAX_SCALE = 64;          // pixels per model unit: the robot's fixed on-screen size
   static FLOOR_RADIUS = 3.2;      // the visible floor disc; the robot stays on it
   static BOWL = 0.06;            // the floor is a very shallow bowl, so the robot rolls back to the middle
 
@@ -208,9 +209,10 @@ class TensegrityRobot {
     this.canvas.height = Math.round(this.height * dpr);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     // Fit the whole floor disc in the width (with a little margin for perspective)
-    this.scale = Math.min(this.width / (2 * TensegrityRobot.FLOOR_RADIUS + 0.9), this.height / 4.9);
+    // and keep one fixed size everywhere else, so the robot does not change size when the layout changes
+    this.scale = Math.min(this.width / (2 * TensegrityRobot.FLOOR_RADIUS + 0.9), this.height / 4.9, TensegrityRobot.MAX_SCALE);
     this.originY = this.height * 0.8; // where the ground under the robot appears
-    if (!this.running) this.draw();
+    this.draw(); // redraw right away (resizing clears the canvas)
   }
 
   toView(p) {

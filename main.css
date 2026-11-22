@@ -187,7 +187,7 @@ h3 {
 
 .hero h1 {
     margin: 0 0 10px;
-    font-size: clamp(2rem, 4.5vw, 2.75rem);
+    font-size: 2.75rem;
     letter-spacing: -0.03em;
 }
 
@@ -263,28 +263,27 @@ h3 {
     pointer-events: none;
 }
 
-/* Medium screens: photo above the text, still left-aligned */
-@media (max-width: 1080px) {
-    .hero-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
-    }
-
-    .avatar {
-        width: 140px;
-    }
-}
-
-/* Small screens: everything stacked and centred, robot below */
-@media (max-width: 760px) {
+/*
+ * Sizes stay fixed while the window is resized; the layout only changes at two points:
+ * below 1180px the robot moves under the text, below 640px the photo moves above the name.
+ */
+@media (max-width: 1179px) {
     .hero-inner {
         grid-template-columns: minmax(0, 1fr);
         gap: 8px;
     }
 
+    .hero-robot {
+        height: 360px;
+    }
+}
+
+@media (max-width: 639px) {
+    /* Phones: photo, name and links centred */
     .hero-content {
+        flex-direction: column;
         align-items: center;
+        gap: 20px;
         text-align: center;
     }
 
@@ -292,8 +291,16 @@ h3 {
         justify-content: center;
     }
 
+    .avatar {
+        width: 120px;
+    }
+
+    .hero h1 {
+        font-size: 2.1rem;
+    }
+
     .hero-robot {
-        height: 300px;
+        height: 320px;
     }
 }
 
@@ -427,11 +434,10 @@ h3 {
     position: sticky;
     top: calc(var(--nav-height) + 32px);
     margin: 0;
-    padding-top: 3px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    letter-spacing: 0;
-    color: var(--text-subtle);
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--accent);
 }
 
 .section-body {
@@ -615,9 +621,6 @@ h3 {
     .section-grid > h2 {
         position: static;
         font-size: 1.4rem;
-        font-weight: 600;
-        letter-spacing: -0.02em;
-        color: var(--text);
     }
 
     .project {

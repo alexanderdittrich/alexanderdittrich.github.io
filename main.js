@@ -34,7 +34,6 @@ class NetworkAnimation {
     this.mouse = null;
     this.running = false;
     this.visible = true;
-    this.lastWidth = 0;
     this.nextFire = 0;
     this.frame = this.frame.bind(this);
 
@@ -66,19 +65,38 @@ class NetworkAnimation {
     this.height = height;
     this.updateAvoid();
 
-    // Mobile browsers fire "resize" when the address bar shows or hides.
-    // Only reseed when the width actually changes.
-    if (force || width !== this.lastWidth) {
-      this.lastWidth = width;
+    if (force || !this.worldW) {
+      // First layout: size and density of the network are set once
       const t = Math.min(Math.max((width - 320) / (1920 - 320), 0), 1);
       this.count = Math.round(22 + t * 43);
       this.maxDistance = Math.round(120 + t * 110);
+      this.density = this.count / (width * height);
+      this.worldW = width;
+      this.worldH = height;
       this.seed();
-    } else {
-      this.particles.forEach((p) => { p.y = Math.min(p.y, height); });
+    } else if (width > this.worldW || height > this.worldH) {
+      // The window grew beyond anything seen so far: extend the network into
+      // the new space only. Existing nodes keep their positions and scale.
+      const oldW = this.worldW, oldH = this.worldH;
+      this.worldW = Math.max(oldW, width);
+      this.worldH = Math.max(oldH, height);
+      const extra = Math.round(this.density * (this.worldW * this.worldH - oldW * oldH));
+      const now = performance.now();
+      for (let i = 0; i < extra; i++) {
+        let x, y, tries = 0;
+        do {
+          x = Math.random() * this.worldW;
+          y = Math.random() * this.worldH;
+        } while ((x < oldW && y < oldH) || (this.inAvoid(x, y) && ++tries < 50));
+        const p = this.makeParticle(x, y);
+        p.scale = 0;
+        p.born = now; // new nodes fade in
+        this.particles.push(p);
+      }
     }
+    // When the window shrinks nothing changes: nodes outside the view are just not visible
 
-    if (!this.running) this.draw();
+    this.draw(); // redraw right away (resizing clears the canvas)
   }
 
   makeParticle(x, y) {
@@ -234,17 +252,19 @@ class NetworkAnimation {
     for (const p of particles) {
       p.x += p.vx;
       p.y += p.vy;
-      if (p.x < 0 || p.x > this.width) p.vx *= -1;
-      if (p.y < 0 || p.y > this.height) p.vy *= -1;
-      p.x = Math.max(0, Math.min(this.width, p.x));
-      p.y = Math.max(0, Math.min(this.height, p.y));
+      if (p.x < 0 || p.x > this.worldW) p.vx *= -1;
+      if (p.y < 0 || p.y > this.worldH) p.vy *= -1;
+      p.x = Math.max(0, Math.min(this.worldW, p.x));
+      p.y = Math.max(0, Math.min(this.worldH, p.y));
       if (this.inAvoid(p.x, p.y)) {
-        // Push back to the edge of the clearing and bounce off it
+        // Glide out of the clearing (gently, so nodes never jump) and bounce off its edge
         const a = this.avoid;
-        const nx = (p.x - a.cx) / (Math.hypot(p.x - a.cx, p.y - a.cy) || 1);
-        const ny = (p.y - a.cy) / (Math.hypot(p.x - a.cx, p.y - a.cy) || 1);
-        p.x = a.cx + nx * (a.r + 0.5);
-        p.y = a.cy + ny * (a.r + 0.5);
+        const d = Math.hypot(p.x - a.cx, p.y - a.cy) || 1;
+        const nx = (p.x - a.cx) / d;
+        const ny = (p.y - a.cy) / d;
+        const push = Math.min(2, a.r + 0.5 - d);
+        p.x += nx * push;
+        p.y += ny * push;
         const dot = p.vx * nx + p.vy * ny;
         if (dot < 0) {
           p.vx -= 2 * dot * nx;
