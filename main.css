@@ -165,7 +165,21 @@ h3 {
     transition: background-color 0.3s ease;
 }
 
-/* Two columns: photo + text on the left, tensegrity robot on the right */
+/* The floor the robot stands on, along the bottom of the hero (same sketch style, flat) */
+.hero-floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 52px;
+    background-color: var(--sketch);
+    -webkit-mask: url("hero-floor.svg") center bottom / 2560px 52px no-repeat;
+    mask: url("hero-floor.svg") center bottom / 2560px 52px no-repeat;
+    pointer-events: none;
+    transition: background-color 0.3s ease;
+}
+
+/* Two columns: photo + text on the left, room for the tensegrity robot on the right */
 .hero-inner {
     position: relative;
     width: 100%;
@@ -263,44 +277,63 @@ h3 {
     text-decoration-color: var(--accent);
 }
 
-/* Interactive tensegrity robot (see tensegrity.js) */
-.hero-robot {
-    position: relative;
-    height: 440px;
-}
-
+/* Interactive tensegrity robot (see tensegrity.js). Its canvas covers the whole hero;
+   the robot rests on the hero's bottom edge and can be moved across its full width.
+   The canvas ignores the pointer; the script listens on the hero instead. */
 .tensegrity {
     position: absolute;
-    left: 0;
-    bottom: 0;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
-    touch-action: none;
-    pointer-events: auto;
-}
-
-/* Two-column layout: the canvas reaches up to the top of the page, so the robot
-   can fall in from above at page load (the area above the robot is empty) */
-@media (min-width: 1180px) {
-    .tensegrity {
-        height: calc(100% + 640px);
-    }
-}
-
-.tensegrity.pointing { cursor: pointer; }
-.tensegrity.dragging { cursor: grabbing; }
-
-.robot-hint {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: 0;
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--text-subtle);
     pointer-events: none;
+}
+
+.hero.robot-pointing { cursor: pointer; }
+.hero.robot-dragging { cursor: grabbing; }
+
+/* Empty space in the layout where the robot rests at first */
+.hero-robot {
+    height: 220px;
+}
+
+/* Floats above the robot (positioned by the script) */
+/* A small speech bubble that floats above the robot (positioned by the script) */
+.robot-hint {
+    --bubble-line: color-mix(in srgb, var(--text-subtle) 45%, transparent);
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 4px 11px;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--bubble-line);
+    border-radius: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+/* The bubble's little tail, pointing down at the robot */
+.robot-hint::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    width: 8px;
+    height: 8px;
+    background: var(--surface);
+    border-right: 1px solid var(--bubble-line);
+    border-bottom: 1px solid var(--bubble-line);
+    transform: translateX(-50%) rotate(45deg);
+}
+
+.robot-hint.shown {
+    opacity: 1;
 }
 
 /*
@@ -334,7 +367,7 @@ h3 {
     }
 
     .hero-robot {
-        height: 340px;
+        height: 190px;
     }
 }
 
