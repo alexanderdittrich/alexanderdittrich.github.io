@@ -357,6 +357,11 @@ h3 {
     border-radius: 999px;
 }
 
+.contact-link i {
+    margin-right: 8px;
+    font-size: 0.9em;
+}
+
 /* ---------- Projects: one row per project ---------- */
 
 .projects-list {
