@@ -150,6 +150,21 @@ h3 {
     height: 100%;
 }
 
+/* Sketch of a cave ceiling along the top of the page, behind the network and the robot.
+   Same technique as the cave floor: fixed size, centred, coloured via the theme. */
+.cave-ceiling {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 160px;
+    background-color: var(--sketch);
+    -webkit-mask: url("cave-ceiling.svg") center top / 2560px 160px no-repeat;
+    mask: url("cave-ceiling.svg") center top / 2560px 160px no-repeat;
+    pointer-events: none;
+    transition: background-color 0.3s ease;
+}
+
 /* Two columns: photo + text on the left, tensegrity robot on the right */
 .hero-inner {
     position: relative;
@@ -205,16 +220,32 @@ h3 {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 0;
     font-size: 0.98rem;
+    line-height: 2.1;
+    text-wrap: balance; /* spread the links evenly over the lines (no lonely last link) */
 }
 
-.hero-links li + li::before {
+/* Links flow like words: each one moves to the next line as a whole */
+.hero-links li {
+    display: inline;
+    white-space: nowrap;
+}
+
+/* Separator dot after each link; hidden (but kept in place) at the end of a line, see main.js */
+.hero-links li:not(:last-child):not(.links-break)::after {
     content: '·';
-    margin: 0 12px;
+    margin: 0 8px 0 12px; /* the space between the links adds ~4px on the right */
     color: var(--text-subtle);
+}
+
+.hero-links li.line-end::after {
+    visibility: hidden;
+}
+
+/* The links always form the same two lines: Email · Scholar · GitHub / EPFL · Mastodon · Bluesky · YouTube */
+.hero-links .links-break {
+    display: block;
+    height: 0;
 }
 
 .hero-links a {
@@ -232,10 +263,6 @@ h3 {
     text-decoration-color: var(--accent);
 }
 
-.hero-links-social {
-    margin-top: 8px;
-}
-
 /* Interactive tensegrity robot (see tensegrity.js) */
 .hero-robot {
     position: relative;
@@ -243,12 +270,22 @@ h3 {
 }
 
 .tensegrity {
-    position: relative;
+    position: absolute;
+    left: 0;
+    bottom: 0;
     display: block;
     width: 100%;
     height: 100%;
     touch-action: none;
     pointer-events: auto;
+}
+
+/* Two-column layout: the canvas reaches up to the top of the page, so the robot
+   can fall in from above at page load (the area above the robot is empty) */
+@media (min-width: 1180px) {
+    .tensegrity {
+        height: calc(100% + 640px);
+    }
 }
 
 .tensegrity.pointing { cursor: pointer; }
@@ -267,8 +304,8 @@ h3 {
 }
 
 /*
- * Sizes stay fixed while the window is resized; the layout only changes at two points:
- * below 1180px the robot moves under the text, below 640px the photo moves above the name.
+ * Sizes stay fixed while the window is resized. The layout changes only once:
+ * below 1180px everything is stacked and centred (photo, name, links, then the robot).
  */
 @media (max-width: 1179px) {
     .hero-inner {
@@ -276,13 +313,6 @@ h3 {
         gap: 8px;
     }
 
-    .hero-robot {
-        height: 360px;
-    }
-}
-
-@media (max-width: 639px) {
-    /* Phones: photo, name and links centred */
     .hero-content {
         flex-direction: column;
         align-items: center;
@@ -290,20 +320,21 @@ h3 {
         text-align: center;
     }
 
-    .hero-links {
-        justify-content: center;
-    }
-
     .avatar {
-        width: 120px;
+        width: 140px;
     }
 
     .hero h1 {
-        font-size: 2.1rem;
+        font-size: 2.3rem;
+        text-wrap: balance; /* only very small phones need two lines */
+    }
+
+    .hero-links {
+        font-size: 0.92rem;
     }
 
     .hero-robot {
-        height: 320px;
+        height: 340px;
     }
 }
 

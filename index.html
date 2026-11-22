@@ -44,7 +44,9 @@
   <body>
     <!-- Hero -->
     <header class="hero" id="top">
-      <canvas id="network-canvas" data-avoid=".hero-robot" aria-hidden="true"></canvas>
+      <!-- Sketch of a cave ceiling, behind the animations (purely decorative) -->
+      <div class="cave-ceiling" aria-hidden="true"></div>
+      <canvas id="network-canvas" data-avoid=".hero-robot" data-below=".cave-ceiling" aria-hidden="true"></canvas>
       <div class="hero-inner">
         <div class="hero-content">
           <img src="alex.webp" alt="Portrait of Alexander Dittrich" class="avatar" width="400" height="400" />
@@ -57,9 +59,8 @@
               <li><a href="mailto:alexander.dittrich@epfl.ch">Email</a></li>
               <li><a href="https://scholar.google.com/citations?user=-G2nWLMAAAAJ">Google Scholar</a></li>
               <li><a href="https://github.com/alexanderdittrich">GitHub</a></li>
+              <li class="links-break" aria-hidden="true"></li>
               <li><a href="https://people.epfl.ch/alexander.dittrich">EPFL</a></li>
-            </ul>
-            <ul class="hero-links hero-links-social">
               <li><a href="https://mastodon.social/@alexdittrich" rel="me">Mastodon</a></li>
               <li><a href="https://bsky.app/profile/alexdittrich.bsky.social">Bluesky</a></li>
               <li><a href="https://www.youtube.com/@alexanderdittrich">YouTube</a></li>

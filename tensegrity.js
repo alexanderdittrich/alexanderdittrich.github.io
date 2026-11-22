@@ -22,6 +22,16 @@ class TensegrityRobot {
   static STEP = 1000 / 60;        // fixed simulation step in ms, independent of screen refresh rate
   static ITERATIONS = 12;
   static DAMPING = 0.96;
+  static AIR_DAMPING = 0.995;      // while falling in at page load: almost no air resistance
+  static DROP_HEIGHT = 10;         // start this far above the ground (off-screen)
+  static DROP_SIDE = -1.3;         // ...and this far to the left; it flies in on an arc towards the middle
+  static DROP_DELAY = 350;         // ms before it starts falling
+  static BOUNCE = 0.35;            // the first touchdown sends it back up with this share of its speed
+  static LANDING = 0.3;            // share of the sideways speed kept at the bounce
+  static SETTLE_DAMPING = 0.88;    // extra damping right after touchdown, so it settles in place
+  static SETTLE_STEPS = 70;        // ...for this many steps (~1 s)
+  static DROP_SPIN = 0.015;        // slow spin around the vertical axis while falling (rad per step)
+  static RECENTER_STEPS = 600;     // after touchdown, gently keep it centred for ~10 s (fading out)
   static GRAVITY = 0.0015;        // model units per step^2 (low = slow, calm tipping)
   static FRICTION = 0.35;         // share of sliding velocity removed on ground contact
   static GRIP = 1;                // static friction: feet on the ground stay exactly in place
@@ -44,6 +54,7 @@ class TensegrityRobot {
 
     this.readColors();
     this.build();
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.dropIn();
     this.resize();
     this.bindEvents();
     this.updateRunning();
@@ -101,6 +112,25 @@ class TensegrityRobot {
     }
   }
 
+  // Lift the settled robot off-screen (high up and a little to the left) so it flies in on an
+  // arc at page load, spinning slowly around its vertical axis, and lands with a bounce
+  dropIn() {
+    const T = TensegrityRobot;
+    const cx = this.nodes.reduce((sum, n) => sum + n.p[0], 0) / this.nodes.length;
+    const cz = this.nodes.reduce((sum, n) => sum + n.p[2], 0) / this.nodes.length;
+    // sideways speed so that the arc ends near the middle (air damping 0.995 -> distance ~ v / (1 - 0.995) * 0.45)
+    const vx = -T.DROP_SIDE / 90;
+    for (const n of this.nodes) {
+      n.p[0] += T.DROP_SIDE;
+      n.p[1] += T.DROP_HEIGHT;
+      const rx = n.p[0] - cx - T.DROP_SIDE, rz = n.p[2] - cz;
+      // previous position set so that the node already moves sideways and along the spin
+      n.q = [n.p[0] + T.DROP_SPIN * rz - vx, n.p[1], n.p[2] - T.DROP_SPIN * rx];
+    }
+    this.dropping = true;
+    this.dropAt = performance.now() + T.DROP_DELAY;
+  }
+
   dist(a, b) {
     return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
   }
@@ -119,8 +149,10 @@ class TensegrityRobot {
     const feet = this.nodes.filter((n) => n.p[1] < this.groundAt(n.p) + 0.001).map((n) => ({ n, x: n.p[0], z: n.p[2] }));
 
     // Verlet integration with gravity
+    const damping = this.dropping ? T.AIR_DAMPING : this.settleSteps > 0 ? T.SETTLE_DAMPING : T.DAMPING;
+    if (this.settleSteps > 0) this.settleSteps--;
     for (const n of this.nodes) {
-      const v = [0, 1, 2].map((k) => (n.p[k] - n.q[k]) * T.DAMPING);
+      const v = [0, 1, 2].map((k) => (n.p[k] - n.q[k]) * damping);
       n.q = n.p.slice();
       n.p = [n.p[0] + v[0], n.p[1] + v[1] - T.GRAVITY, n.p[2] + v[2]];
     }
@@ -175,6 +207,20 @@ class TensegrityRobot {
       }
     }
 
+    // While it wobbles after the drop-in, nudge it gently back to the middle of its floor
+    // (a rigid shift of the whole body, fading out, so no speed is added)
+    if (this.recenterSteps > 0) {
+      const fade = this.recenterSteps / T.RECENTER_STEPS;
+      const rx = this.nodes.reduce((sum, n) => sum + n.p[0], 0) / this.nodes.length;
+      const rz = this.nodes.reduce((sum, n) => sum + n.p[2], 0) / this.nodes.length;
+      const k = 0.035 * fade;
+      for (const n of this.nodes) {
+        n.p[0] -= rx * k; n.q[0] -= rx * k;
+        n.p[2] -= rz * k; n.q[2] -= rz * k;
+      }
+      this.recenterSteps--;
+    }
+
     // Keep the robot on its floor disc: if its centre drifts too far out,
     // move the whole body back (rigidly, so the structure is not squeezed)
     const cx = this.nodes.reduce((sum, n) => sum + n.p[0], 0) / this.nodes.length;
@@ -189,6 +235,29 @@ class TensegrityRobot {
         n.p[2] -= shiftZ; n.q[2] -= shiftZ;
       }
     }
+
+    // Drop-in: the first touchdown is a bounce, the second one ends the fall
+    if (this.dropping && this.nodes.some((n) => n.p[1] <= this.groundAt(n.p) + 0.001)) {
+      if (!this.bounced) {
+        // Bounce: send the whole robot back up with part of its falling speed
+        this.bounced = true;
+        const vy = this.nodes.reduce((sum, n) => sum + (n.p[1] - n.q[1]), 0) / this.nodes.length;
+        for (const n of this.nodes) {
+          n.q[1] = n.p[1] + vy * T.BOUNCE;                    // vertical speed becomes -BOUNCE * vy (upwards)
+          n.q[0] = n.p[0] - (n.p[0] - n.q[0]) * T.LANDING;   // most sideways motion is lost
+          n.q[2] = n.p[2] - (n.p[2] - n.q[2]) * T.LANDING;
+        }
+      } else if (this.bounceSteps > 10) {
+        // Second touchdown: a soft, heavy landing; then it settles in place
+        this.dropping = false;
+        for (const n of this.nodes) {
+          for (let k = 0; k < 3; k++) n.q[k] = n.p[k] - (n.p[k] - n.q[k]) * 0.15;
+        }
+        this.settleSteps = T.SETTLE_STEPS;
+        this.recenterSteps = T.RECENTER_STEPS;
+      }
+    }
+    if (this.bounced && this.dropping) this.bounceSteps = (this.bounceSteps || 0) + 1;
 
     // Friction for nodes touching the ground
     for (const n of this.nodes) {
@@ -208,10 +277,12 @@ class TensegrityRobot {
     this.canvas.width = Math.round(this.width * dpr);
     this.canvas.height = Math.round(this.height * dpr);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // The canvas may extend above its box (room for the drop-in); size and position follow the box
+    const box = this.canvas.parentElement.clientHeight || this.height;
     // Fit the whole floor disc in the width (with a little margin for perspective)
     // and keep one fixed size everywhere else, so the robot does not change size when the layout changes
-    this.scale = Math.min(this.width / (2 * TensegrityRobot.FLOOR_RADIUS + 0.9), this.height / 4.9, TensegrityRobot.MAX_SCALE);
-    this.originY = this.height * 0.8; // where the ground under the robot appears
+    this.scale = Math.min(this.width / (2 * TensegrityRobot.FLOOR_RADIUS + 0.9), box / 4.9, TensegrityRobot.MAX_SCALE);
+    this.originY = this.height - box * 0.2; // where the ground under the robot appears
     this.draw(); // redraw right away (resizing clears the canvas)
   }
 
@@ -264,6 +335,8 @@ class TensegrityRobot {
   draw() {
     const { ctx, palette, nodes, struts, cables } = this;
     ctx.clearRect(0, 0, this.width, this.height);
+    // Fade in at the start of the drop-in (softens the entry where the canvas has an edge)
+    ctx.globalAlpha = this.dropAt ? Math.min(Math.max((performance.now() - this.dropAt) / 400, 0), 1) : 1;
     const pts = nodes.map((n) => this.project(n.p));
     const depthAlpha = (z) => 0.5 + 0.5 * Math.min(Math.max((z + 3) / 6, 0), 1);
     ctx.lineCap = 'round';
@@ -319,7 +392,7 @@ class TensegrityRobot {
         ctx.stroke();
       } else {
         const p = pts[item.i];
-        const r = Math.max(3, 0.06 * p.s);
+        const r = Math.max(5, 0.12 * p.s); // large end caps, like on the real robot
         const active = item.i === this.hoverNode || (this.dragged && this.dragged.index === item.i);
         ctx.fillStyle = active ? `rgba(${palette.accent}, 1)` : `rgba(${palette.strut}, ${alpha})`;
         ctx.beginPath();
@@ -448,14 +521,14 @@ class TensegrityRobot {
     this.accumulator = Math.min((this.accumulator || 0) + (now - this.lastTime), 100);
     this.lastTime = now;
     while (this.accumulator >= TensegrityRobot.STEP) {
-      this.step(now);
+      if (!this.dropAt || now >= this.dropAt) this.step(now); // hold in the air until the drop starts
       this.accumulator -= TensegrityRobot.STEP;
     }
     this.draw();
 
     // Stop the loop when nothing moves any more (saves battery)
     const motion = Math.max(...this.nodes.map((n, i) => this.dist(n.p, before[i])));
-    const busy = this.dragged || this.cables.some((c) => c.actuatedAt);
+    const busy = this.dragged || this.dropping || this.cables.some((c) => c.actuatedAt);
     this.restFrames = motion < 0.0004 && !busy ? this.restFrames + 1 : 0;
     if (this.restFrames > 60) {
       this.running = false;

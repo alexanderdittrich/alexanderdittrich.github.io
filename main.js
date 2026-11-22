@@ -39,6 +39,9 @@ class NetworkAnimation {
 
     // Optional area the network keeps out of (e.g. data-avoid=".hero-robot")
     this.avoidEl = canvas.dataset.avoid ? document.querySelector(canvas.dataset.avoid) : null;
+    // Optional element the network stays below (e.g. data-below=".cave-ceiling")
+    this.belowEl = canvas.dataset.below ? document.querySelector(canvas.dataset.below) : null;
+    this.top = 0;
     this.avoid = null;
 
     this.readColors();
@@ -70,7 +73,7 @@ class NetworkAnimation {
       const t = Math.min(Math.max((width - 320) / (1920 - 320), 0), 1);
       this.count = Math.round(22 + t * 43);
       this.maxDistance = Math.round(120 + t * 110);
-      this.density = this.count / (width * height);
+      this.density = this.count / (width * Math.max(height - this.top, 1));
       this.worldW = width;
       this.worldH = height;
       this.seed();
@@ -86,7 +89,7 @@ class NetworkAnimation {
         let x, y, tries = 0;
         do {
           x = Math.random() * this.worldW;
-          y = Math.random() * this.worldH;
+          y = this.top + Math.random() * (this.worldH - this.top);
         } while ((x < oldW && y < oldH) || (this.inAvoid(x, y) && ++tries < 50));
         const p = this.makeParticle(x, y);
         p.scale = 0;
@@ -113,6 +116,11 @@ class NetworkAnimation {
 
   // The avoided area is a circle around the element (a round "clearing")
   updateAvoid() {
+    if (this.belowEl) {
+      const b = this.belowEl.getBoundingClientRect();
+      const h = this.host.getBoundingClientRect();
+      this.top = Math.max(0, b.bottom - h.top);
+    }
     if (!this.avoidEl) return;
     const r = this.avoidEl.getBoundingClientRect();
     const h = this.host.getBoundingClientRect();
@@ -145,7 +153,7 @@ class NetworkAnimation {
       let x, y, tries = 0;
       do {
         x = Math.random() * this.width;
-        y = Math.random() * this.height;
+        y = this.top + Math.random() * (this.height - this.top);
       } while (this.inAvoid(x, y) && ++tries < 50);
       const p = this.makeParticle(x, y);
       p.scale = 0;
@@ -228,6 +236,7 @@ class NetworkAnimation {
   }
 
   addNode(x, y) {
+    y = Math.max(y, this.top);
     const p = this.makeParticle(x, y);
     p.scale = 0;
     p.born = performance.now();
@@ -253,9 +262,9 @@ class NetworkAnimation {
       p.x += p.vx;
       p.y += p.vy;
       if (p.x < 0 || p.x > this.worldW) p.vx *= -1;
-      if (p.y < 0 || p.y > this.worldH) p.vy *= -1;
+      if (p.y < this.top || p.y > this.worldH) p.vy *= -1;
       p.x = Math.max(0, Math.min(this.worldW, p.x));
-      p.y = Math.max(0, Math.min(this.worldH, p.y));
+      p.y = Math.max(this.top, Math.min(this.worldH, p.y));
       if (this.inAvoid(p.x, p.y)) {
         // Glide out of the clearing (gently, so nodes never jump) and bounce off its edge
         const a = this.avoid;
@@ -467,6 +476,31 @@ function initThemeToggle() {
 }
 
 /* --------------------------------------------------------------------------
+ * Hero links: hide the separator dot at the end of each wrapped line
+ * ------------------------------------------------------------------------ */
+
+function initLinkSeparators() {
+  const lists = document.querySelectorAll('.hero-links');
+  const update = () => {
+    lists.forEach((list) => {
+      const items = Array.from(list.children);
+      items.forEach((li, i) => {
+        const next = items[i + 1];
+        li.classList.toggle('line-end', !!next && next.offsetTop > li.offsetTop);
+      });
+    });
+  };
+  update();
+  let pending = false;
+  window.addEventListener('resize', () => {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => { pending = false; update(); });
+  });
+  if (document.fonts) document.fonts.ready.then(update); // widths change once the web font loads
+}
+
+/* --------------------------------------------------------------------------
  * Start
  * ------------------------------------------------------------------------ */
 
@@ -474,3 +508,4 @@ const canvas = document.getElementById('network-canvas');
 if (canvas && canvas.getContext) new NetworkAnimation(canvas);
 initVideos();
 initThemeToggle();
+initLinkSeparators();
